@@ -5,7 +5,7 @@
 prefix?= "$(PWD)/projects"
 release?= 0
 only?= "*"
-tag?= "curvebs:unknown"
+tag?= "cloudx2021/curvebs:unknown"
 tgt_pkg?= ""
 
 list:
@@ -22,3 +22,11 @@ image:
 
 clean:
 	@bazel clean
+
+#action 使用的脚本
+pre_image:
+	@bash util/pre_image.sh $(tag) $(tgt_pkg)
+
+#action 使用的脚本
+image_build:
+	@bash util/docker_build.sh $(tag) $(tgt_pkg)

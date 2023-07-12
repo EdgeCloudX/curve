@@ -1,0 +1,32 @@
+name: build and push image
+on:
+  push:
+    branches:
+      - ecx-*
+env:
+  # 镜像版本号
+  VERSION: v1.2.6.0
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+      - name: Run Docker container to compile
+        uses: addnab/docker-run-action@v3
+        with:
+          image: opencurvedocker/curve-base:build-debian9
+          options: -e IMAGE_NAME=${{ secrets.DOCKERHUB_USERNAME }}/curvebs:${{ env.VERSION }} -v ${{ github.workspace }}:/curve -w /curve -v /var/run/docker.sock:/var/run/docker.sock -v /root/.docker:/root/.docker --privileged
+          run: |
+            bash util/build.sh --only=etcd
+            make build
+            make image tag=$IMAGE_NAME
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Create docker image and Push
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/curvebs:${{ env.VERSION }}
