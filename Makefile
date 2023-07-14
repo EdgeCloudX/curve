@@ -22,11 +22,3 @@ image:
 
 clean:
 	@bazel clean
-
-#action 使用的脚本
-pre_image:
-	@bash util/pre_image.sh $(tag) $(tgt_pkg)
-
-#action 使用的脚本
-image_build:
-	@bash util/docker_build.sh $(tag) $(tgt_pkg)
